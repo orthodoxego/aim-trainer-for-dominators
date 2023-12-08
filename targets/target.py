@@ -8,7 +8,7 @@ from settings.settings import Settings
 
 class Target:
 
-    def __init__(self, x1, x2, y1, y2, timing):
+    def __init__(self, x1, x2, y1, y2, timing, sounds):
         self.width = randint(int(Settings.WIDTH * 0.03), int(Settings.WIDTH * 0.07))
         self.height = randint(int(Settings.WIDTH * 0.03), int(Settings.WIDTH * 0.07))
         self.rect: Rect = Rect((
@@ -22,6 +22,9 @@ class Target:
         self.y1 = y1
         self.y2 = y2
         self.timing = timing
+
+        self.sounds = sounds
+        self.beeper = True
 
         self.color = [255, 160, 0]
         self.enabled = True
@@ -39,6 +42,10 @@ class Target:
         if self.color[1] == 0:
             self.color = (200, 200, 0)
             self.destroy_step += 10 * delta_time
+            if self.beeper:
+                self.sounds.play_alarm()
+                self.beeper = False
+
         elif self.color[1] == 200:
             self.color = (255, 0, 0)
             self.destroy_step += 10 * delta_time

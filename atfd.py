@@ -76,7 +76,7 @@ while play_game:
     pygame.display.update()
     # ==========================================================================================
 
-    engine.act(delta_time=delta_time, frame=frame)
+    engine.act(delta_time=delta_time)
 
     # ==========================================================================================
     delta_time = clock.tick(Settings.FPS) / 1000

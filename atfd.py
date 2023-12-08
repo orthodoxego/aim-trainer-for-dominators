@@ -14,6 +14,7 @@ import time
 
 from ctypes import wintypes
 from random import randint
+from engine.engine import Engine
 
 from settings.settings import Settings
 
@@ -45,13 +46,20 @@ user32.SetWindowPos.argtypes = [wintypes.HWND, wintypes.HWND,
 user32.SetWindowPos(hwnd, -1, 0, 0, 0, 0, 0x0001)
 # =============================
 play_game = True
-FPS = 60                    # Изменить, чтобы увеличить/уменьшить ФПС
 delta_time = 0               # Синхронизация движения с частотой кадров
 frame = 0
 # =============================
 
+# Задать границы области для появления фигур
+engine = Engine(int(Settings.WIDTH * 0.25), int(Settings.WIDTH * 0.75),
+                int(Settings.HEIGHT * 0.25), int(Settings.HEIGHT * 0.75))
+
+# ==========================================================================================
+# ==========================================================================================
+# ==========================================================================================
 while play_game:
 
+    # ==========================================================================================
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             play_game = False
@@ -60,14 +68,16 @@ while play_game:
                 play_game = False
         elif event.type == pygame.MOUSEBUTTONDOWN:
             x, y = pygame.mouse.get_pos()
+            engine.click_mouse(x, y)
 
+    # ==========================================================================================
     scene.fill(transparency)
-
-    # Отрисовка снежинок и перемещение
-
+    engine.draw(scene=scene)
     pygame.display.update()
     # ==========================================================================================
 
+    engine.act(delta_time=delta_time, frame=frame)
 
-    delta_time = clock.tick(FPS) / 1000
+    # ==========================================================================================
+    delta_time = clock.tick(Settings.FPS) / 1000
     frame += 1

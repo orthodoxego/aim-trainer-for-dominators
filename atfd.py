@@ -27,6 +27,9 @@ pygame.display.set_caption("AimTFD")
 Settings.WIDTH = pygame.display.Info().current_w
 Settings.HEIGHT = pygame.display.Info().current_h
 
+pygame.mouse.set_visible(False)
+
+cursor = pygame.image.load("targets/cursor.png")
 clock = pygame.time.Clock()
 
 # Хромакей
@@ -73,6 +76,7 @@ while play_game:
     # ==========================================================================================
     scene.fill(transparency)
     engine.draw(scene=scene)
+    scene.blit(cursor, (pygame.mouse.get_pos()[0] - 16, pygame.mouse.get_pos()[1] - 16))
     pygame.display.update()
     # ==========================================================================================
 

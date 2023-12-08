@@ -8,9 +8,16 @@ from settings.settings import Settings
 
 class Target:
 
-    def __init__(self, x1, x2, y1, y2, timing, sounds):
-        self.width = randint(int(Settings.WIDTH * 0.03), int(Settings.WIDTH * 0.07))
-        self.height = randint(int(Settings.WIDTH * 0.03), int(Settings.WIDTH * 0.07))
+    def __init__(self, x1, x2, y1, y2, timing, sounds, time):
+        self.time = time
+
+        square_w = int((x2 - x1) / (1 + timing / 2))
+
+        # square_h = min(int((y2 - y1) / (1 + timing / 2)), square_w)
+        square_h = min(y2 - y1, square_w)
+
+        self.width = randint(int(square_w / 2), square_w)
+        self.height = randint(int(square_h / 2), square_h)
         self.rect: Rect = Rect((
                                randint(x1, int(x2 - self.width)),
                                randint(y1, int(y2 - self.height)),
@@ -35,13 +42,14 @@ class Target:
             return
 
         if self.color[1] > 0 and self.color[1] != 200:
-            self.color[1] -= 160 / self.timing * delta_time
+            self.color[1] -= (10 / (1 / self.timing)) * delta_time
             if self.color[1] < 1:
                 self.color[1] = 0
 
         if self.color[1] == 0:
             self.color = (200, 200, 0)
-            self.destroy_step += 10 * delta_time
+            self.destroy_step += 20 * delta_time
+
             if self.beeper:
                 self.sounds.play_alarm()
                 self.beeper = False
@@ -61,3 +69,8 @@ class Target:
                          self.color,
                          self.rect,
                          0)
+        pygame.draw.circle(scene,
+                         (200, 255, 200),
+                           (self.rect.centerx, self.rect.centery),
+                         10)
+

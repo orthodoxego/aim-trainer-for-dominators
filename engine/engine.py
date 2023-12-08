@@ -22,7 +22,7 @@ class Engine:
         self.frame = 1
         self.timing = 1
         self.adding_seconds = 10
-        self.score = 1000000
+        self.damage = 0
         self.targets_list = []
         self.all_time = 0
 
@@ -37,7 +37,7 @@ class Engine:
             target.draw(scene)
 
         react_time = 0 if self.count_firing == 0 else round(self.all_time * 1000 / self.count_firing, 1)
-        self.font.draw(scene, int(self.score), self.count_firing, react_time)
+        self.font.draw(scene, int(self.damage), self.count_firing, react_time)
 
     def act(self, delta_time):
         if self.frame % int(1 + self.adding_seconds * delta_time * Settings.FPS) == 0 and len(self.targets_list) == 0:
@@ -53,8 +53,6 @@ class Engine:
         for target in self.targets_list:
             target.act(delta_time)
 
-            self.score -= (abs(target.width + target.height) * 1.3) * delta_time * randint(300, 550)
-
             if not target.enabled:
                 self.targets_list.remove(target)
 
@@ -68,25 +66,37 @@ class Engine:
     def click_mouse(self, x, y):
         for target in self.targets_list:
             if target.rect.collidepoint(x, y):
-                self.sounds.play_shoot()
-                point_x = target.width - abs(target.rect.center[0] - x)
-                point_y = target.height - abs(target.rect.center[1] - y)
 
-                points = (point_x + point_y) // 2
-                # self.score += points
+                a = (x - target.rect.centerx) ** 2
+                b = (y - target.rect.centery) ** 2
+                c = (a + b) ** 0.5
+
+                headshot = False
+
+                if c < 10:
+                    headshot = True
+                    dmg = 100
+                    self.sounds.play_headshot()
+                else:
+                    self.sounds.play_shoot()
+                    dmg = max(5, 80 - int(((c / target.rect.width + c / target.rect.height) / 4) * 100))
+
+
                 self.targets_list.remove(target)
                 self.adding_seconds += 1
                 self.count_firing += 1
                 self.all_time += time.time() - target.time
 
                 r = randint(900, 1300)
-                self.font.add_moving_text(f"+{points * r}", points * r)
 
-    def adding_score(self, score):
+
+                self.font.add_moving_text(f"+{dmg}", dmg)
+
+    def adding_damage(self, damage):
 
         self.sounds.play_add_score()
-        self.score += score
+        self.damage += damage
 
-        self.timing += 1
+        self.timing += 0.3
         if self.timing > 60:
             self.timing = 60

@@ -11,6 +11,7 @@ class Sounds:
         self.shoot = pygame.mixer.Sound("sounds/shoot.ogg")
         self.alarm = pygame.mixer.Sound("sounds/alarm.ogg")
         self.add_score = pygame.mixer.Sound("sounds/add_score.ogg")
+        self.headshot = pygame.mixer.Sound("sounds/headshot.ogg")
 
 
     def play_shoot(self):
@@ -21,3 +22,6 @@ class Sounds:
 
     def play_add_score(self):
         self.add_score.play()
+
+    def play_headshot(self):
+        self.headshot.play()

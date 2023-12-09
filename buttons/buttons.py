@@ -118,15 +118,15 @@ class Buttons:
         elif btn == 2:  # Активировать двойной
             self.btns[2].active = False
             self.btns[3].active = True
-            Settings.fire = 2
+            Settings.counting_shoot_for_end_target = 2
         elif btn == 3:  # Активировать тройной
             self.btns[3].active = False
             self.btns[4].active = True
-            Settings.fire = 3
+            Settings.counting_shoot_for_end_target = 3
         elif btn == 4:  # Активировать одиночный
             self.btns[4].active = False
             self.btns[2].active = True
-            Settings.fire = 1
+            Settings.counting_shoot_for_end_target = 1
         elif btn == 5:  # Звук откл
             self.btns[5].active = False
             self.btns[6].active = True

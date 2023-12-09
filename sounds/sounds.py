@@ -15,11 +15,12 @@ class Sounds:
         self.add_score = pygame.mixer.Sound("sounds/add_score.ogg")
         self.headshot = pygame.mixer.Sound("sounds/headshot.ogg")
         self.click = pygame.mixer.Sound("sounds/click.ogg")
+        self.bad = pygame.mixer.Sound("sounds/bad.ogg")
 
 
     def play_shoot(self):
         if Settings.sounds:
-            self.shoot.play()
+            pygame.mixer.Channel(2).play(self.shoot)
 
     def play_alarm(self):
         if Settings.sounds:
@@ -31,8 +32,12 @@ class Sounds:
 
     def play_headshot(self):
         if Settings.sounds:
-            self.headshot.play()
+            pygame.mixer.Channel(1).play(self.headshot)
 
     def play_click(self):
         if Settings.sounds:
             self.click.play()
+
+    def play_bad(self):
+        if Settings.sounds:
+            self.bad.play()

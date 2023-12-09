@@ -85,6 +85,7 @@ while play_game:
                 play_game = False
         elif event.type == pygame.MOUSEBUTTONDOWN:
             riffle = True
+            pause_riffle = 0
             x, y = pygame.mouse.get_pos()
             btn = buttons.click_mouse(x, y, sounds)
             if btn == 8:
@@ -106,17 +107,19 @@ while play_game:
 
     engine.act(delta_time=delta_time)
 
-    if riffle and pause_riffle == 0:
-        x, y = pygame.mouse.get_pos()
-        cursor.recoil()
-        engine.click_mouse(x + cursor.corrx, y + cursor.corry)
-        cursor.correct_recoil()
+    if riffle:
 
-    if riffle and pause_riffle > 0:
-        pause_riffle -= 1
+        if pause_riffle == 0:
+            x, y = pygame.mouse.get_pos()
+            cursor.recoil()
+            cursor.increase_recoil()
+            if engine.click_mouse(x + cursor.corrx, y + cursor.corry):
+                pause_riffle = 0
+        if pause_riffle > 0:
+            pause_riffle -= 1
+        else:
+            pause_riffle = 4 + randint(0, 2)
     else:
-        pause_riffle = 4 + randint(0, 2)
-    if not riffle:
         cursor.act(delta_time=delta_time)
 
     # ==========================================================================================

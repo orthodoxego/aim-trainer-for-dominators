@@ -5,4 +5,4 @@ class Settings:
 
     moving = False
     sounds = True
-    fire = 1
+    counting_shoot_for_end_target = 1

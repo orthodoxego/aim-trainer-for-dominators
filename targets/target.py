@@ -59,6 +59,7 @@ class Target:
             self.destroy_step += 10 * delta_time
 
         if self.destroy_step > self.timing // 2:
+            self.sounds.play_bad()
             self.enabled = False
 
     def draw(self, scene: pygame.surface):

@@ -37,6 +37,13 @@ class Target:
         self.enabled = True
         self.destroy_step = 0
 
+        self.vectorx = 0
+        if Settings.moving:
+            if self.rect.x < (x2 + x1) / 2:
+                self.vectorx = self.rect.width * 2 / randint(2, 4)
+            else:
+                self.vectorx = -self.rect.width * 2 / randint(2, 4)
+
     def act(self, delta_time):
         if not self.enabled:
             return
@@ -57,6 +64,11 @@ class Target:
         elif self.color[1] == 200:
             self.color = (255, 0, 0)
             self.destroy_step += 10 * delta_time
+
+        self.rect.x += self.vectorx * delta_time
+        if self.rect.x < self.x1 or self.rect.x + self.rect.width > self.x2:
+            self.vectorx *= -1
+            self.rect.x += self.vectorx * delta_time
 
         if self.destroy_step > self.timing // 2:
             self.sounds.play_bad()

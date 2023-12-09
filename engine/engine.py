@@ -14,13 +14,13 @@ class Engine:
 
     def __init__(self, x1, x2, y1, y2, sounds):
 
-        self.headshot = False
         self.x1 = x1
         self.x2 = x2
         self.y1 = y1
         self.y2 = y2
 
         self.count_firing = 0
+        self.headshot = False
         self.frame = 1
         self.timing = 1
         self.adding_seconds = 10
@@ -38,8 +38,16 @@ class Engine:
         self.decoys = []
         self.count_riffle = 0
 
+        self.life = x2 - x1
+        self.minus_life = self.life / 230
+
     def draw(self, scene):
+
         pygame.draw.rect(scene, (10, 10, 10), (self.x1, self.y1, self.x2 - self.x1, self.y2 - self.y1))
+
+        pygame.draw.rect(scene, (37, 37, 37), (self.x1, self.y2 + 5, self.y2 - self.y1, 10))
+        pygame.draw.rect(scene, (100, 255, 0), (self.x1, self.y2 + 5, self.life, 10))
+
 
         if self.headshot:
             pygame.draw.rect(scene, (255, 0, 50),
@@ -70,6 +78,7 @@ class Engine:
             target.act(delta_time)
 
             if not target.enabled:
+                self.dec_life(2)
                 self.targets_list.remove(target)
 
         self.frame += 1
@@ -110,15 +119,20 @@ class Engine:
                 self.all_time += time.time() - target.time
                 self.font.add_moving_text(f"+{dmg}", dmg)
                 return True
+
+
         self.sounds.play_shoot()
 
         # Если не попадает, добавляем декой
-        self.decoys.append(Decoy(
-            x - self.decoy_img.get_width() // 2,
-            y - self.decoy_img.get_height() // 2,
-            self.decoy_img))
-        if len(self.decoys) > 50:
-            del self.decoys[0]
+        if x > self.x1 and x < self.x2 and y > self.y1 and y < self.y2:
+            self.decoys.append(Decoy(
+                x - self.decoy_img.get_width() // 2,
+                y - self.decoy_img.get_height() // 2,
+                self.decoy_img))
+            if len(self.decoys) > 50:
+                del self.decoys[0]
+
+        self.dec_life(0.5)
         return False
 
     def adding_damage(self, damage):
@@ -126,6 +140,11 @@ class Engine:
         self.sounds.play_add_score()
         self.damage += damage
 
-        self.timing += 0.3
+        self.timing += 0.15
         if self.timing > 60:
             self.timing = 60
+
+    def dec_life(self, multiple):
+        self.life -= self.minus_life * multiple
+        if self.life < 0:
+            self.life = 0

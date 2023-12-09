@@ -108,13 +108,12 @@ while play_game:
     engine.act(delta_time=delta_time)
 
     if riffle:
-
         if pause_riffle == 0:
             x, y = pygame.mouse.get_pos()
-            cursor.recoil()
-            cursor.increase_recoil()
             if engine.click_mouse(x + cursor.corrx, y + cursor.corry):
                 pause_riffle = 0
+            cursor.recoil()
+            cursor.increase_recoil()
         if pause_riffle > 0:
             pause_riffle -= 1
         else:

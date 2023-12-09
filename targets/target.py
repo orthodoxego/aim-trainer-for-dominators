@@ -38,11 +38,23 @@ class Target:
         self.destroy_step = 0
 
         self.vectorx = 0
-        if Settings.moving:
-            if self.rect.x < (x2 + x1) / 2:
-                self.vectorx = self.rect.width * 2 / randint(2, 4)
-            else:
-                self.vectorx = -self.rect.width * 2 / randint(2, 4)
+        self.strafe_width = randint(int(Settings.WIDTH * 0.05), int(Settings.WIDTH * 0.1))
+
+        if self.rect.x < (x2 + x1) / 2:
+            self.vectorx = self.rect.width * 2 / randint(2, 4)
+        else:
+            self.vectorx = -self.rect.width * 2 / randint(2, 4)
+
+        self.first_point = self.rect.x
+
+        self.random_mode = Settings.STOP
+        if Settings.mode == Settings.RANDOM:
+            r = randint(1, 3)
+            if r == 1:
+                self.random_mode = Settings.MOVING
+            elif r == 2:
+                self.random_mode = Settings.STRAFE
+
 
     def act(self, delta_time):
         if not self.enabled:
@@ -65,10 +77,11 @@ class Target:
             self.color = (255, 0, 0)
             self.destroy_step += 10 * delta_time
 
-        self.rect.x += self.vectorx * delta_time
-        if self.rect.x < self.x1 or self.rect.x + self.rect.width > self.x2:
-            self.vectorx *= -1
-            self.rect.x += self.vectorx * delta_time
+        if Settings.mode == Settings.MOVING or self.random_mode == Settings.MOVING:
+            self.run_moving(delta_time)
+        elif Settings.mode == Settings.STRAFE or self.random_mode == Settings.STRAFE:
+            self.run_strafe(delta_time)
+
 
         if self.destroy_step > self.timing // 2:
             self.sounds.play_bad()
@@ -87,3 +100,19 @@ class Target:
                            (self.rect.centerx, self.rect.centery),
                          10)
 
+    def check_vector(self, delta_time):
+        if self.rect.x < self.x1 or self.rect.x + self.rect.width > self.x2:
+            self.vectorx *= -1
+            self.rect.x += self.vectorx * delta_time
+
+    def run_moving(self, delta_time):
+        self.rect.x += self.vectorx * delta_time
+        self.check_vector(delta_time)
+
+    def run_strafe(self, delta_time):
+        self.rect.x += self.vectorx * delta_time
+        if self.rect.x > self.first_point + self.strafe_width \
+                or self.rect.x < self.first_point - self.strafe_width:
+            self.vectorx *= -1
+            self.rect.x += self.vectorx * delta_time
+        self.check_vector(delta_time)

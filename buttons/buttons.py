@@ -19,14 +19,16 @@ class Buttons:
         self.width_field = x2 - x1
         self.height_field = y2 - y1
 
-        self.btns.append(Btn(self.get_scaled_img(pygame.image.load("buttons/btn0101.png"))))
+        # Без движения
+        self.btns.append(Btn(self.get_scaled_img(pygame.image.load("buttons/btn0102.png"))))
         self.btns[0].rect = self.btns[0].img.get_rect()
         self.btns[0].rect.x = x1
         self.btns[0].rect.y = y1 - self.btns[0].rect.height * 1.1
         self.btns[0].num = 0
         self.btns[0].active = True
 
-        self.btns.append(Btn(self.get_scaled_img(pygame.image.load("buttons/btn0102.png"))))
+        # Движение
+        self.btns.append(Btn(self.get_scaled_img(pygame.image.load("buttons/btn0101.png"))))
         self.btns[1].rect = self.btns[1].img.get_rect()
         self.btns[1].rect.x = x1
         self.btns[1].rect.y = y1 - self.btns[1].rect.height * 1.1
@@ -78,14 +80,18 @@ class Buttons:
         self.btns[8].num = 8
         self.btns[8].active = True
 
+        self.btns.append(Btn(self.get_scaled_img(pygame.image.load("buttons/btn0103.png"))))
+        self.btns[9].rect = self.btns[9].img.get_rect()
+        self.btns[9].rect.x = x1
+        self.btns[9].rect.y = y1 - self.btns[9].rect.height * 1.1
+        self.btns[9].num = 9
 
-        # self.btn0102 = pygame.image.load("buttons/btn0102.png")
-        # self.btn0201 = pygame.image.load("buttons/btn0201.png")
-        # self.btn0202 = pygame.image.load("buttons/btn0202.png")
-        # self.btn0203 = pygame.image.load("buttons/btn0203.png")
-        # self.btn0301 = pygame.image.load("buttons/btn0301.png")
-        # self.btn0302 = pygame.image.load("buttons/btn0302.png")
-        # self.btn0401 = pygame.image.load("buttons/btn0401.png")
+        self.btns.append(Btn(self.get_scaled_img(pygame.image.load("buttons/btn0104.png"))))
+        self.btns[10].rect = self.btns[10].img.get_rect()
+        self.btns[10].rect.x = x1
+        self.btns[10].rect.y = y1 - self.btns[10].rect.height * 1.1
+        self.btns[10].num = 10
+
 
     def get_scaled_img(self, img) -> pygame.image:
         new_width = self.width_field / 5.3
@@ -107,14 +113,26 @@ class Buttons:
                 sounds.play_click()
                 btn = b.num
 
-        if btn == 0:    # Убрать движение
+        if btn == 0:    # Активировать движение
             self.btns[0].active = False
             self.btns[1].active = True
-            Settings.moving = False
-        elif btn == 1:  # Активировать движение
+            Settings.mode = Settings.MOVING
+        elif btn == 1:  # Убрать движение
             self.btns[1].active = False
+            self.btns[9].active = True
+            Settings.mode = Settings.STRAFE
+        elif btn == 9:
+            self.btns[9].active = False
+            self.btns[10].active = True
+            Settings.mode = Settings.RANDOM
+        elif btn == 10:
+            self.btns[10].active = False
             self.btns[0].active = True
-            Settings.moving = True
+            Settings.mode = Settings.STOP
+
+
+
+
         elif btn == 2:  # Активировать двойной
             self.btns[2].active = False
             self.btns[3].active = True

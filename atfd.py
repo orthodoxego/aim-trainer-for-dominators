@@ -12,11 +12,20 @@ import win32con
 import win32gui
 import time
 
+from buttons.buttons import Buttons
 from ctypes import wintypes
 from random import randint
+
+from engine.cursor import Cursor
 from engine.engine import Engine
 
 from settings.settings import Settings
+from sounds.sounds import Sounds
+
+def get_engine():
+    return Engine(int(Settings.WIDTH * 0.25), int(Settings.WIDTH * 0.75),
+                int(Settings.HEIGHT * 0.25), int(Settings.HEIGHT * 0.75),
+                sounds)
 
 pygame.init()
 scene = pygame.display.set_mode((0, 0),
@@ -29,7 +38,7 @@ Settings.HEIGHT = pygame.display.Info().current_h
 
 pygame.mouse.set_visible(False)
 
-cursor = pygame.image.load("targets/cursor.png")
+cursor = Cursor(pygame.image.load("buttons/cursor.png"))
 clock = pygame.time.Clock()
 
 # Хромакей
@@ -53,9 +62,14 @@ delta_time = 0               # Синхронизация движения с ч
 frame = 0
 # =============================
 
+sounds = Sounds()
+
 # Задать границы области для появления фигур
-engine = Engine(int(Settings.WIDTH * 0.25), int(Settings.WIDTH * 0.75),
-                int(Settings.HEIGHT * 0.25), int(Settings.HEIGHT * 0.75))
+engine = get_engine()
+buttons = Buttons(engine.x1, engine.x2, engine.y1, engine.y2)
+
+riffle = False
+pause_riffle = 0
 
 # ==========================================================================================
 # ==========================================================================================
@@ -70,17 +84,40 @@ while play_game:
             if event.key == pygame.K_ESCAPE:
                 play_game = False
         elif event.type == pygame.MOUSEBUTTONDOWN:
+            riffle = True
             x, y = pygame.mouse.get_pos()
-            engine.click_mouse(x, y)
+            btn = buttons.click_mouse(x, y, sounds)
+            if btn == 8:
+                play_game = False
+            elif btn == 7:
+                engine = get_engine()
+        elif event.type == pygame.MOUSEBUTTONUP:
+            cursor.recoil_correct = 1
+            riffle = False
+
 
     # ==========================================================================================
     scene.fill(transparency)
     engine.draw(scene=scene)
-    scene.blit(cursor, (pygame.mouse.get_pos()[0] - 16, pygame.mouse.get_pos()[1] - 16))
+    buttons.draw(scene=scene)
+    cursor.draw(scene=scene)
     pygame.display.update()
     # ==========================================================================================
 
     engine.act(delta_time=delta_time)
+
+    if riffle and pause_riffle == 0:
+        x, y = pygame.mouse.get_pos()
+        cursor.recoil()
+        engine.click_mouse(x + cursor.corrx, y + cursor.corry)
+        cursor.correct_recoil()
+
+    if riffle and pause_riffle > 0:
+        pause_riffle -= 1
+    else:
+        pause_riffle = 4 + randint(0, 2)
+    if not riffle:
+        cursor.act(delta_time=delta_time)
 
     # ==========================================================================================
     delta_time = clock.tick(Settings.FPS) / 1000

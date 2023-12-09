@@ -11,7 +11,7 @@ from sounds.sounds import Sounds
 
 class Engine:
 
-    def __init__(self, x1, x2, y1, y2):
+    def __init__(self, x1, x2, y1, y2, sounds):
 
         self.x1 = x1
         self.x2 = x2
@@ -26,7 +26,7 @@ class Engine:
         self.targets_list = []
         self.all_time = 0
 
-        self.sounds = Sounds()
+        self.sounds = sounds
         self.font = Font(self)
 
     def draw(self, scene):
@@ -71,10 +71,10 @@ class Engine:
                 b = (y - target.rect.centery) ** 2
                 c = (a + b) ** 0.5
 
-                headshot = False
+                target.adding_shoot_random_x = randint(-2, 2)
+                target.adding_shoot_random_y = randint(0, 2)
 
                 if c < 10:
-                    headshot = True
                     dmg = 100
                     self.sounds.play_headshot()
                 else:
@@ -89,8 +89,9 @@ class Engine:
 
                 r = randint(900, 1300)
 
-
                 self.font.add_moving_text(f"+{dmg}", dmg)
+            else:
+                self.sounds.play_shoot()
 
     def adding_damage(self, damage):
 

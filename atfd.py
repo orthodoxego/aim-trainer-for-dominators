@@ -18,6 +18,7 @@ from random import randint
 
 from engine.cursor import Cursor
 from engine.engine import Engine
+from engine.font.end_stage import EndStage
 
 from settings.settings import Settings
 from sounds.sounds import Sounds
@@ -70,6 +71,7 @@ buttons = Buttons(engine.x1, engine.x2, engine.y1, engine.y2)
 
 riffle = False
 pause_riffle = 0
+ending = False
 
 # ==========================================================================================
 # ==========================================================================================
@@ -91,7 +93,14 @@ while play_game:
             if btn == 8:
                 play_game = False
             elif btn == 7:
-                engine = get_engine()
+                # В первый раз создаст сцену со стастистикой
+                if not ending:
+                    engine.dec_life(1000)
+                    ending = True
+                # ...по второму нажатию запустит
+                else:
+                    ending = False
+                    engine = get_engine()
         elif event.type == pygame.MOUSEBUTTONUP:
             cursor.recoil_correct = 1
             riffle = False
@@ -120,6 +129,9 @@ while play_game:
             pause_riffle = 4 + randint(0, 2)
     else:
         cursor.act(delta_time=delta_time)
+
+    if engine.end_training:
+        engine = EndStage(engine.x1, engine.x2, engine.y1, engine.y2, engine.data_dict)
 
     # ==========================================================================================
     delta_time = clock.tick(Settings.FPS) / 1000

@@ -40,6 +40,13 @@ class Engine:
 
         self.life = x2 - x1
         self.minus_life = self.life / 230
+        self.end_training: bool = False
+
+        self.data_dict = {}
+        self.center_headshot = 0
+        self.average_reaction = 0
+        self.missed_the_target = 0
+        self.missed_the_figure = 0
 
     def draw(self, scene):
 
@@ -60,7 +67,8 @@ class Engine:
         for target in self.targets_list:
             target.draw(scene)
 
-        react_time = 0 if self.count_firing == 0 else round(self.all_time * 1000 / self.count_firing, 1)
+        self.average_reaction = 0 if self.count_firing == 0 else self.all_time * 1000 / self.count_firing
+        react_time = 0 if self.count_firing == 0 else round(self.average_reaction, 1)
         self.font.draw(scene, int(self.damage), self.count_firing, react_time)
 
     def act(self, delta_time):
@@ -78,6 +86,7 @@ class Engine:
             target.act(delta_time)
 
             if not target.enabled:
+                self.missed_the_figure += 1
                 self.dec_life(2)
                 self.targets_list.remove(target)
 
@@ -102,6 +111,7 @@ class Engine:
                 self.headshot = False
                 if c < 10:
                     dmg = 100
+                    self.center_headshot += 1
                     self.sounds.play_headshot()
                     self.headshot = True
                 else:
@@ -120,11 +130,10 @@ class Engine:
                 self.font.add_moving_text(f"+{dmg}", dmg)
                 return True
 
-
-        self.sounds.play_shoot()
-
-        # Если не попадает, добавляем декой
         if x > self.x1 and x < self.x2 and y > self.y1 and y < self.y2:
+            self.sounds.play_shoot()
+
+            # Если не попадает, добавляем декой
             self.decoys.append(Decoy(
                 x - self.decoy_img.get_width() // 2,
                 y - self.decoy_img.get_height() // 2,
@@ -132,7 +141,8 @@ class Engine:
             if len(self.decoys) > 50:
                 del self.decoys[0]
 
-        self.dec_life(0.5)
+            self.missed_the_target += 1
+            self.dec_life(0.5)
         return False
 
     def adding_damage(self, damage):
@@ -146,5 +156,12 @@ class Engine:
 
     def dec_life(self, multiple):
         self.life -= self.minus_life * multiple
-        if self.life < 0:
+        if self.life < 0 or multiple == 1000:
+            self.data_dict["damage"] = self.damage
+            self.data_dict['headshot'] = self.center_headshot
+            self.data_dict['all_firing'] = self.count_firing
+            self.data_dict['missed_the_target'] = self.missed_the_target
+            self.data_dict['missed_the_figure'] = self.missed_the_figure
+            self.data_dict['average_reaction'] = round(self.average_reaction / 1000, 3)
             self.life = 0
+            self.end_training = True
